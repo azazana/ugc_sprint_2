@@ -1,0 +1,10 @@
+aioredis==2.0.1
+fastapi==0.80.0
+orjson==3.7.12
+pydantic==1.9.2
+uvicorn==0.18.3
+uvloop==0.16.0
+gunicorn==20.1.0
+kafka-python==2.0.2
+aiokafka==0.7.2
+sentry-sdk[fastapi]==1.9.7
