@@ -1,10 +1,16 @@
 """Брокер сообщений кафка."""
-
 import json
+import logging
 from uuid import uuid4
 
 from aiokafka import AIOKafkaProducer
 from broker.base import EventBroker
+from api.v1.logging_setup import setup_root_logger
+
+log_filename = "logs/fastapi-elk-stack.log"
+setup_root_logger(log_filename)
+# Get logger for module
+LOGGER = logging.getLogger("")
 
 
 class KafkaBroker(EventBroker):
@@ -28,7 +34,7 @@ class KafkaBroker(EventBroker):
             )
             return "data has excepted by kafka"
         except Exception:
-            return "Error"
+            return LOGGER.error('Ошибка в отправке данных в кафку')
         # finally:
         #     await producer.stop()
 

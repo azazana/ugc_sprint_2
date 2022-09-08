@@ -1,15 +1,6 @@
 """Config for fast api kafka."""
 
-import logging
-from logging import config as logging_config
-
 from pydantic import BaseSettings
-
-from core.logger import LOGGING
-
-# Применяем настройки логирования
-logging_config.dictConfig(LOGGING)
-logger = logging.getLogger()
 
 
 class Settings(BaseSettings):
@@ -22,4 +13,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-logger.info(settings.dict())

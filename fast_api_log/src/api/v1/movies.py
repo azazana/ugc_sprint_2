@@ -1,24 +1,70 @@
 """Ручки для ETL."""
 
+import logging
+import random
 from http import HTTPStatus
 
+from api.v1.logging_setup import setup_root_logger, record_factory
 from broker.kafka import KafkaBroker
-from core.config import logger
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.base import MovieModel, Parameters
 from servises.views_movies import get_kafka_service
-import os
+
+log_filename = "logs/fastapi-elk-stack.log"
+setup_root_logger(log_filename)
+# Get logger for module
+LOGGER = logging.getLogger(__name__)
+
+LOGGER.info("---Starting App---")
 router = APIRouter()
 
 
+#
+# class RequestIdFilter(logging.Filter):
+#
+#     def __init__(self, request: Request = None):
+#         super().__init__()
+#         self.request = request
+#
+#     def filter(self, record):
+#         if self.request is not None:
+#             record.request_id = self.request.headers.get('x-request-id')
+#         else:
+#             record.request_id = ""
+#         return True
+
+class RequestIdFilter(logging.Filter):
+    def __init__(self, request: Request = None):
+        super().__init__()
+        self.request = request
+
+    def filter(self, record):
+        record.request_id = self.request.headers.get('x-request-id')
+        return True
+
+
+@router.get('/',
+            summary="Статус просмотра фильма",
+            response_description="Сообщение для кафки о статусе просмотра фильма",
+            )
+async def index(request: Request):
+    """
+     Для тестирования log.
+     """
+    result = random.randint(1, 50)
+    LOGGER.addFilter(RequestIdFilter(request))
+    LOGGER.info(f'Пользователю досталось число {result}')
+    return f"Ваше число {result}!"
+
+
 @router.post(
-    "/",
+    "/film",
     summary="Статус просмотра фильма",
     response_description="Сообщение для кафки о статусе просмотра фильма",
 )
-async def put_film_to_kafka(
-        param: Parameters = Depends(),
-        kafka_service: KafkaBroker = Depends(get_kafka_service)) -> str:
+async def put_film_to_kafka(request: Request,
+                            param: Parameters = Depends(),
+                            kafka_service: KafkaBroker = Depends(get_kafka_service)) -> str:
     """
     Отправка сообщений о статусе просмотра фильма.
 
@@ -32,7 +78,7 @@ async def put_film_to_kafka(
         movie_model = MovieModel(topic="movie", **param.dict())
         return await kafka_service.send_msg(**movie_model.dict())
     except Exception as exception:
-        logger.exception(exception)
+        LOGGER.error('Ошибка в отправке данных в кафку')
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
 
 
@@ -40,8 +86,8 @@ async def put_film_to_kafka(
             summary="Тестирование sentry",
             response_description="Используется для тестирования sentry",
             )
-async def trigger_error():
+async def trigger_error(request: Request):
     """
-    Отправка сообщений о статусе просмотра фильма.
+    Для тестирования sentry.
     """
     division_by_zero = 1 / 0

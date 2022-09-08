@@ -8,3 +8,4 @@ gunicorn==20.1.0
 kafka-python==2.0.2
 aiokafka==0.7.2
 sentry-sdk[fastapi]==1.9.7
+python-logstash==0.4.8
