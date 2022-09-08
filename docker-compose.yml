@@ -1,0 +1,106 @@
+version: '2.2'
+services:
+    logstash:
+      image: docker.elastic.co/logstash/logstash:7.10.2
+      depends_on:
+        - elasticsearch
+      environment:
+        XPACK_MONITORING_ENABLED: "false"
+        ES_HOST: "elasticsearch:9200"
+      ports:
+        - "5044:5044/udp"
+      volumes:
+        - ./fast_api_log/deploy/logstash.conf:/config/logstash.conf:ro
+      command: logstash -f /config/logstash.conf
+
+    elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+      environment:
+        # Указываем ES запуститься в одном экземпляре
+        discovery.type: single-node
+      ports:
+        - 9200:9200
+      volumes:
+        - /tmp/esdata_fast:/tmp/elasticsearch/data
+      # Обратите внимание: не стоит использовать для ELK тот же ES, который задействован для полнотекстового поиска в вашем сервисе
+
+    kibana:
+      image: docker.elastic.co/kibana/kibana:7.10.2
+      ports:
+        - "5601:5601"
+      depends_on:
+        - elasticsearch
+
+    app:
+      container_name: "fast_api_log"
+      build: ./fast_api_log
+      restart: always
+      environment:
+        host_kafka: "${host_kafka}"
+        port_kafka: 9092
+        SENTRY_DSN: "${SENTRY_DSN}"
+      ports:
+        - 8000:8000
+      volumes:
+        - ./fast_api_log/src/logs/:/code/logs/
+
+    nginx:
+      image: nginx:1.19.2
+      volumes:
+        - ./fast_api_log/deploy/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./fast_api_log/deploy/etc/nginx/conf.d:/etc/nginx/conf.d:ro
+        - /tmp/logs/nginx/:/var/log/nginx/
+      depends_on:
+        - app
+      ports:
+        - 8080:80
+
+    filebeat:
+      build:
+        context: ./fast_api_log/filebeat
+      container_name: filebeat
+      volumes:
+        - ./fast_api_log/src/logs/:/src/logs
+        - /tmp/logs/nginx:/var/log/nginx:ro
+      depends_on:
+        - elasticsearch
+        - kibana
+        - nginx
+        - logstash
+        - app
+
+    broker:
+      image: confluentinc/cp-server:6.0.1
+      hostname: broker
+      container_name: broker
+      depends_on:
+        - zookeeper_kafka
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: 'zookeeper_kafka:2181'
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+        KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+        KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+        KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+        KAFKA_JMX_PORT: 9101
+        KAFKA_JMX_HOSTNAME: broker
+        KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+        CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+        CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+        CONFLUENT_METRICS_ENABLE: 'true'
+        CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+      healthcheck:
+        test: "exit 0"
+
+    zookeeper_kafka:
+      image: confluentinc/cp-zookeeper:6.0.1
+      hostname: zookeeper_kafka
+      container_name: zookeeper_kafka
+      environment:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
