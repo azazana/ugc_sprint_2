@@ -1,1 +1,4 @@
-pymongo
+pymongo==4.2.0
+faker==14.2.0
+clickhouse_driver==0.2.4
+backoff==2.1.3

@@ -5,7 +5,7 @@
 docker-compose up --build
 bash build.sh
 pip install -r requirements.txt
-python test.pys
+python run_test_mongodb.py
 ```
 
 
