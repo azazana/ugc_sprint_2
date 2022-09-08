@@ -1,18 +1,18 @@
 """Основной модуль для запуска fastapi."""
 
-import logging  # logging — стандартная Python-библиотека для настройки логирования
 import os
-import uuid
+from typing import Tuple
+from uuid import uuid4
+
 import aiokafka
 import sentry_sdk
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+
 from api.v1 import movies
 from core.config import settings
 from db import kafka_db
-from typing import Tuple
-from uuid import uuid4
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
@@ -25,7 +25,6 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
 )
-
 
 app.include_router(movies.router, prefix="/api/v1/movies", tags=["movies"])
 
@@ -46,8 +45,8 @@ async def shutdown() -> None:
 
 @app.middleware("http")
 async def request_middleware(request, call_next):
+    """Добавление requist id в заголовки."""
     id_header: Tuple[bytes] = "x-request-id".encode(), str(uuid4()).encode()
-
     request.headers.__dict__["_list"].append(id_header)
     try:
         response = await call_next(request)

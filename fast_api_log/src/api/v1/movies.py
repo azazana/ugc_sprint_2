@@ -4,7 +4,7 @@ import logging
 import random
 from http import HTTPStatus
 
-from api.v1.logging_setup import setup_root_logger, record_factory
+from api.v1.logging_setup import setup_root_logger
 from broker.kafka import KafkaBroker
 from fastapi import APIRouter, Depends, HTTPException, Request
 from models.base import MovieModel, Parameters
@@ -19,33 +19,20 @@ LOGGER.info("---Starting App---")
 router = APIRouter()
 
 
-#
-# class RequestIdFilter(logging.Filter):
-#
-#     def __init__(self, request: Request = None):
-#         super().__init__()
-#         self.request = request
-#
-#     def filter(self, record):
-#         if self.request is not None:
-#             record.request_id = self.request.headers.get('x-request-id')
-#         else:
-#             record.request_id = ""
-#         return True
-
 class RequestIdFilter(logging.Filter):
+    """Добавление requist_id в заголовки сообщений."""
     def __init__(self, request: Request = None):
         super().__init__()
         self.request = request
 
     def filter(self, record):
-        record.request_id = self.request.headers.get('x-request-id')
+        record.request_id = self.request.headers.get("x-request-id")
         return True
 
 
-@router.get('/',
-            summary="Статус просмотра фильма",
-            response_description="Сообщение для кафки о статусе просмотра фильма",
+@router.get("/",
+            summary="Тестирование логирования",
+            response_description="Тестирование логирования данных",
             )
 async def index(request: Request):
     """
@@ -53,7 +40,7 @@ async def index(request: Request):
      """
     result = random.randint(1, 50)
     LOGGER.addFilter(RequestIdFilter(request))
-    LOGGER.info(f'Пользователю досталось число {result}')
+    LOGGER.info(f"Пользователю досталось число {result}")
     return f"Ваше число {result}!"
 
 
@@ -77,8 +64,9 @@ async def put_film_to_kafka(request: Request,
     try:
         movie_model = MovieModel(topic="movie", **param.dict())
         return await kafka_service.send_msg(**movie_model.dict())
-    except Exception as exception:
-        LOGGER.error('Ошибка в отправке данных в кафку')
+    except Exception:
+        LOGGER.addFilter(RequestIdFilter(request))
+        LOGGER.error("Ошибка в отправке данных в кафку")
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
 
 
