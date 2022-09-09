@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     DB_BACKOFF_MAX_TIME: int = 20
     DB_BACKOFF_MAX_TRIES: int = 50
 
+    COLLECTION_LIKE = "likedFilms"
+    COLLECTION_REVIEW = "reviews"
+    COLLECTION_BOOKMARK = "bookmarks"
+
     @validator("CLICKHOUSE_CLUSTER_HOST", pre=True)
     def set_cluster_hosts(cls, value: str) -> list[str]:
         """Установка значения параметра CLICKHOUSE_CLUSTER_HOST."""

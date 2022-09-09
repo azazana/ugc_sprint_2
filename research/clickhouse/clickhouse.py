@@ -5,7 +5,7 @@ from typing import Any, Optional
 import backoff
 from clickhouse_driver import Client, errors
 
-from settings_research import settings
+from research.settings_research import settings
 
 
 class ClickhouseAdapter:
@@ -26,10 +26,10 @@ class ClickhouseAdapter:
         max_tries=settings.DB_BACKOFF_MAX_TRIES,
         raise_on_giveup=False,
     )
-    def execute(self, command: str) -> Optional[Any]:
+    def execute(self, command: str, values=None) -> Optional[Any]:
         """Исполнение запроса в ClickHouse."""
         try:
-            return self.client.execute(command)
+            return self.client.execute(command, values)
         except errors.ServerException as exception:
             if exception.code != 57:
                 raise exception
