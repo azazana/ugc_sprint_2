@@ -5,7 +5,7 @@ from typing import Any, Optional
 import backoff
 from clickhouse_driver import Client, errors
 
-from research.settings_research import settings
+from settings_research import settings
 
 
 class ClickhouseAdapter:
