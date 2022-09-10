@@ -16,9 +16,6 @@ def record_factory(*args, request_id="", **kwargs):
 def setup_root_logger(log_filename, logger):
     """ Setup configuration of the root logger of the application."""
 
-    # get instance of root logger
-    # logger = logging.getLogger("")
-
     # configure formatter for logger
     formatter = logging.Formatter(LOG_FORMAT)
 

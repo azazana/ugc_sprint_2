@@ -21,6 +21,7 @@ router = APIRouter()
 
 class RequestIdFilter(logging.Filter):
     """Добавление requist_id в заголовки сообщений."""
+
     def __init__(self, request: Request = None):
         super().__init__()
         self.request = request

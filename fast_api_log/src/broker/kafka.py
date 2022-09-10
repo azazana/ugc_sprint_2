@@ -10,7 +10,7 @@ from broker.base import EventBroker
 log_filename = "logs/fastapi-elk-stack.log"
 # Get logger for module
 LOGGER = logging.getLogger(__name__)
-setup_root_logger(log_filename,LOGGER)
+setup_root_logger(log_filename, LOGGER)
 
 
 class KafkaBroker(EventBroker):
