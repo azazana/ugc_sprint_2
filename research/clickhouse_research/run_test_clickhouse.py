@@ -4,7 +4,7 @@ import time
 from typing import Callable
 from uuid import uuid4
 
-from fake_data import fake_like_event, fake_batch, fake_bookmark_event, fake_review_event, fake_users_batch
+from fake_data import fake_batch, fake_bookmark_event, fake_like_event, fake_review_event, fake_users_batch
 from settings_research import settings
 
 from .clickhouse import ClickhouseAdapter
@@ -17,7 +17,7 @@ TEST_RECORDS_SIZE = 10000
 
 
 def init_clickhouse(
-        fields: dict[str, str], table,
+        fields: dict[str, str], table: str,
 ) -> None:
     """Инициализация таблицы в ClickHouse."""
     adapter.create_db(settings.SHARD_DB, cluster=settings.CLICKHOUSE_CLUSTER)
@@ -68,13 +68,13 @@ def test_read_data(faker: Callable, collection_name: str, users_size: int) -> No
     statistics = []
     users = [str(uuid4()) for _ in range(users_size)]
 
-    for i in range(0, TEST_RECORDS_SIZE, OPTIMAL_BATCH_SIZE):
+    for _ in range(0, TEST_RECORDS_SIZE, OPTIMAL_BATCH_SIZE):
         batch = fake_users_batch(faker, users, batch_size=OPTIMAL_BATCH_SIZE)
         adapter.execute(f"""INSERT INTO {collection_name} (user_id) VALUES""", batch)
 
     for user in users:
         start = time.time()
-        _ = list(adapter.execute(F"SELECT * FROM {collection_name} WHERE user_id = '{user}'"))
+        _ = list(adapter.execute(f"SELECT * FROM {collection_name} WHERE user_id = '{user}'"))
         statistics.append(time.time() - start)
 
     mean_batch = sum(statistics) / len(statistics)

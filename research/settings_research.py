@@ -17,7 +17,6 @@ class Settings(BaseSettings):
     REPLICA_DB = "replica"
     USER_CH = "ugc_user"
     PASSWORD_CH = "12345"
-    TABLE_TEST: str = "test_ch"
 
     DB_BACKOFF_MAX_TIME: int = 20
     DB_BACKOFF_MAX_TRIES: int = 50

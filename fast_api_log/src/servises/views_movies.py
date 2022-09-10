@@ -11,6 +11,5 @@ from fastapi import Depends
 def get_kafka_service(
         kafka_producer: AIOKafkaProducer = Depends(get_kafka_producer),
 ) -> AIOKafkaProducer:
-    """Для внедрения зависимостей.
-    Returns - инстанс кафки"""
+    """Для внедрения зависимостей."""
     return KafkaBroker(kafka_producer)

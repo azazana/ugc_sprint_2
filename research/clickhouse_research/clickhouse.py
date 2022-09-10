@@ -4,7 +4,6 @@ from typing import Any, Optional
 
 import backoff
 from clickhouse_driver import Client, errors
-
 from settings_research import settings
 
 
