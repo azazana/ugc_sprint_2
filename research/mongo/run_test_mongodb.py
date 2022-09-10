@@ -3,8 +3,9 @@ import time
 from typing import Callable
 from uuid import uuid4
 
-from fake_data import fake_batch, fake_bookmark_event, fake_like_event, fake_review_event, fake_users_batch
 from pymongo import MongoClient
+
+from research.fake_data import fake_batch, fake_bookmark_event, fake_like_event, fake_review_event, fake_users_batch
 
 MONGO_HOST = "127.0.0.1"
 MONGO_PORT = 27017

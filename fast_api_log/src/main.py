@@ -7,12 +7,11 @@ from uuid import uuid4
 import aiokafka
 import sentry_sdk
 import uvicorn
-from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
-
 from api.v1 import movies
 from core.config import settings
 from db import kafka_db
+from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
@@ -50,7 +49,7 @@ async def request_middleware(request, call_next):
     request.headers.__dict__["_list"].append(id_header)
     try:
         response = await call_next(request)
-    except Exception as ex:
+    except Exception:
         response = ORJSONResponse(content={"success": False}, status_code=500)
     return response
 

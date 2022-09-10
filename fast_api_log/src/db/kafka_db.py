@@ -1,8 +1,7 @@
 """Для внедрения зависимостей."""
 from typing import Optional
 
-from aiokafka import AIOKafkaConsumer
-from aiokafka import AIOKafkaProducer
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 kafka_producer: Optional[AIOKafkaProducer] = None
 kafka_consumer: Optional[AIOKafkaConsumer] = None

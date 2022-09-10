@@ -4,13 +4,13 @@ import logging
 from uuid import uuid4
 
 from aiokafka import AIOKafkaProducer
-from broker.base import EventBroker
 from api.v1.logging_setup import setup_root_logger
+from broker.base import EventBroker
 
 log_filename = "logs/fastapi-elk-stack.log"
-setup_root_logger(log_filename)
 # Get logger for module
 LOGGER = logging.getLogger(__name__)
+setup_root_logger(log_filename,LOGGER)
 
 
 class KafkaBroker(EventBroker):
@@ -33,7 +33,7 @@ class KafkaBroker(EventBroker):
             )
             LOGGER.info("data has excepted by kafka")
             return "data has excepted by kafka"
-        except Exception as ex:
+        except Exception:
             LOGGER.error("Ошибка в отправке данных в кафку")
             return "Ошибка в отправке данных в кафку"
         # finally:

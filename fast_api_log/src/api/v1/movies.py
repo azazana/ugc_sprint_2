@@ -11,9 +11,9 @@ from models.base import MovieModel, Parameters
 from servises.views_movies import get_kafka_service
 
 log_filename = "logs/fastapi-elk-stack.log"
-setup_root_logger(log_filename)
-# Get logger for module
 LOGGER = logging.getLogger(__name__)
+setup_root_logger(log_filename, LOGGER)
+# Get logger for module
 
 LOGGER.info("---Starting App---")
 router = APIRouter()
@@ -51,7 +51,8 @@ async def index(request: Request):
 )
 async def put_film_to_kafka(request: Request,
                             param: Parameters = Depends(),
-                            kafka_service: KafkaBroker = Depends(get_kafka_service)) -> str:
+                            kafka_service: KafkaBroker = Depends(get_kafka_service)
+                            ) -> str:
     """
     Отправка сообщений о статусе просмотра фильма.
 

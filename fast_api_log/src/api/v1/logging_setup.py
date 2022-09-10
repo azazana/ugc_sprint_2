@@ -13,20 +13,21 @@ def record_factory(*args, request_id="", **kwargs):
     return record
 
 
-def setup_root_logger(log_filename):
+def setup_root_logger(log_filename, logger):
     """ Setup configuration of the root logger of the application."""
 
     # get instance of root logger
-    logger = logging.getLogger("")
+    # logger = logging.getLogger("")
 
     # configure formatter for logger
     formatter = logging.Formatter(LOG_FORMAT)
 
-    file = logging.handlers.RotatingFileHandler(filename=log_filename, mode='a',
-                                                maxBytes=15000000, backupCount=5)
-    file.setFormatter(formatter)
+    file_log = logging.handlers.RotatingFileHandler(filename=log_filename, mode='a',
+                                                    maxBytes=15000000, backupCount=5
+                                                    )
+    file_log.setFormatter(formatter)
     # add handlers
-    logger.addHandler(file)
+    logger.addHandler(file_log)
     # configure logger level
     logging.setLogRecordFactory(record_factory)
 
