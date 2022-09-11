@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - '*'
-  push:
-    branches:
-      - 'main'
 
 jobs:
   build:
@@ -38,11 +35,13 @@ jobs:
         run: |
           mypy src
 
+  notify:
+    runs-on: ubuntu-latest
+    steps:
       - name: send notification in telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Pull Request:
-            ${{ steps.ping.outputs.status }}
+            Pull Request: from $GITHUB_HEAD_REF to $GITHUB_BASE_REF. Build status: ${{ build.status }}.
