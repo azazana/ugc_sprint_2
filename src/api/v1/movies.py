@@ -26,7 +26,7 @@ class RequestIdFilter(logging.Filter):
 
     def __init__(self, request: Optional[Request] = None) -> None:
         super().__init__()
-        self.request: Request = request
+        self.request = request
 
     def filter(self, record: Any) -> bool:
         """Фильтрация."""
