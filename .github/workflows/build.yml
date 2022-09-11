@@ -39,16 +39,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Hello World
-        env:
-          NEEDS: ${{ toJSON(needs) }}
-        run: |
-          echo "$NEEDS"
-
       - name: send notification in telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Pull Request: from ${{ github.head_ref }} to $GITHUB_BASE_REF. 
+            Pull Request: from ${{ github.head_ref }} to ${{ github.head_ref }}.
+            Pipeline status: ${{ needs.build.result }}
