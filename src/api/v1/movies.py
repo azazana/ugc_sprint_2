@@ -3,7 +3,7 @@
 import logging
 import random
 from http import HTTPStatus
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
@@ -24,13 +24,14 @@ router = APIRouter()
 class RequestIdFilter(logging.Filter):
     """Добавление requist_id в заголовки сообщений."""
 
-    def __init__(self, request: Request = None) -> None:
+    def __init__(self, request: Optional[Request] = None) -> None:
         super().__init__()
-        self.request = request
+        self.request: Request = request
 
     def filter(self, record: Any) -> bool:
         """Фильтрация."""
-        record.request_id = self.request.headers.get("x-request-id")
+        if self.request:
+            record.request_id = self.request.headers.get("x-request-id")
         return True
 
 

@@ -32,15 +32,17 @@ app.include_router(movies.router, prefix="/api/v1/movies", tags=["movies"])
 @app.on_event("startup")
 async def startup() -> None:
     """Иницилиазация продьюсера кафки."""
-    kafka_db.kafka_producer = aiokafka.AIOKafkaProducer(
-        bootstrap_servers=f"{settings.KAFKA_HOST}:{settings.KAFKA_PORT}",
-    )
+    if kafka_db:
+        kafka_db.kafka_producer = aiokafka.AIOKafkaProducer(
+            bootstrap_servers=f"{settings.KAFKA_HOST}:{settings.KAFKA_PORT}",
+        )
 
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
     """Окончание работы продьюсера."""
-    await kafka_db.kafka_producer.stop()
+    if kafka_db:
+        await kafka_db.kafka_producer.stop()
 
 
 @app.middleware("http")

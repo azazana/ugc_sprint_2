@@ -1,12 +1,11 @@
 """Интерфейс брокера сообщений."""
 from abc import ABC, abstractmethod
-from typing import Any
 
 
 class EventBroker(ABC):
     """Абстрактный класс для брокера сообщений."""
 
     @abstractmethod
-    def send_data_to_broker(self, *kwargs) -> Any:
+    async def send_data_to_broker(self, key: str, value: str, topic: str) -> str:
         """Отправка сообщений."""
         pass
