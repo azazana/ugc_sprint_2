@@ -2,7 +2,7 @@
 import logging
 from typing import Any
 
-LOG_FORMAT = "{"log_api":"%(asctime)s - %(levelname)s - %(name)s - %(message)s"} {"request_id": "%(request_id)s"}"
+LOG_FORMAT = '{"log_api":"%(asctime)s - %(levelname)s - %(name)s - %(message)s"} {"request_id": "%(request_id)s"}'
 
 old_factory = logging.getLogRecordFactory()
 
@@ -15,7 +15,7 @@ def record_factory(*args, request_id: str = "", **kwargs) -> Any:
 
 
 def setup_root_logger(log_filename: str, logger: logging.Logger) -> None:
-    """ Setup configuration of the root logger of the application."""
+    """Настройка логгера."""
     formatter = logging.Formatter(LOG_FORMAT)
     file_log = logging.handlers.RotatingFileHandler(filename=log_filename, mode="a", maxBytes=15000000, backupCount=5)
     file_log.setFormatter(formatter)

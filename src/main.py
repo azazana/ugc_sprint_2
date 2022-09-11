@@ -46,7 +46,7 @@ async def shutdown() -> None:
 @app.middleware("http")
 async def request_middleware(request, call_next):
     """Добавление requist id в заголовки."""
-    id_header: Tuple[bytes] = "x-request-id".encode(), str(uuid4()).encode()
+    id_header: Tuple[bytes, bytes] = "x-request-id".encode(), str(uuid4()).encode()
     request.headers.__dict__["_list"].append(id_header)
     try:
         response = await call_next(request)
