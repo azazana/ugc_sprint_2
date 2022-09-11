@@ -51,4 +51,4 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Pull Request: from ${{sgithub.head_ref}} to $GITHUB_BASE_REF. 
+            Pull Request: from ${{ github.head_ref }} to $GITHUB_BASE_REF. 
