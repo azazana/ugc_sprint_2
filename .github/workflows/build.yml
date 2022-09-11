@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10"]
@@ -38,13 +37,9 @@ jobs:
 
   notify:
     needs: build
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Hello World
-        env:
-          NEEDS: ${{ toJSON(github.event) }}
-        run: |
-          echo "$NEEDS"
       - name: send notification in telegram
         uses: appleboy/telegram-action@master
         with:
