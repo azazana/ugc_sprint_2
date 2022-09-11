@@ -40,8 +40,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: test
-        run: echo ${{ toJSON(github.event) }}.
+      - name: Hello World
+        env:
+          NEEDS: ${{ toJSON(github.event) }}
+        run: |
+          echo "$NEEDS"
       - name: send notification in telegram
         uses: appleboy/telegram-action@master
         with:
