@@ -33,7 +33,7 @@ jobs:
 
       - name: Check with mypy
         run: |
-          export MYPYPATH=src/
+          export MYPYPATH=.
           mypy src
 
   notify:
