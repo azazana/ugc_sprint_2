@@ -1,7 +1,7 @@
 """Основной модуль для запуска fastapi."""
 
-import os
-from typing import Tuple, Callable
+from http import HTTPStatus
+from typing import Callable, Tuple
 from uuid import uuid4
 
 import aiokafka
@@ -14,10 +14,11 @@ from api.v1 import movies
 from core.config import settings
 from db import kafka_db
 
-sentry_sdk.init(
-    dsn=os.environ.get("SENTRY_DSN"),
-    traces_sample_rate=1.0,
-)
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        traces_sample_rate=settings.traces_sample_rate,
+    )
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -35,7 +36,7 @@ async def startup() -> None:
     if kafka_db:
         kafka_db.kafka_producer = aiokafka.AIOKafkaProducer(
             bootstrap_servers=f"{settings.KAFKA_HOST}:{settings.KAFKA_PORT}",
-        )  # type: ignore
+        )
 
 
 @app.on_event("shutdown")
@@ -53,7 +54,7 @@ async def request_middleware(request: Request, call_next: Callable) -> ORJSONRes
     try:
         response = await call_next(request)
     except Exception:
-        response = ORJSONResponse(content={"success": False}, status_code=500)
+        response = ORJSONResponse(content={"success": False}, status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
     return response
 
 
