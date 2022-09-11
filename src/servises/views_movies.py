@@ -2,9 +2,10 @@
 from functools import lru_cache
 
 from aiokafka import AIOKafkaProducer
+from fastapi import Depends
+
 from broker.kafka import KafkaBroker
 from db.kafka_db import get_kafka_producer
-from fastapi import Depends
 
 
 @lru_cache()

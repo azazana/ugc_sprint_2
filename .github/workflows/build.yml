@@ -3,9 +3,6 @@ name: Build
 on:
   pull_request:
     branches:
-      - '*'
-  push:
-    branches:
       - 'main'
 
 jobs:
@@ -13,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v3
@@ -36,13 +33,20 @@ jobs:
 
       - name: Check with mypy
         run: |
-          mypy src
+          export MYPYPATH=src/
+          mypy src --ignore-missing-imports
 
+  notify:
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
       - name: send notification in telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Pull Request:
-            ${{ steps.ping.outputs.status }}
+            New build in Pull Request:  ${{ github.head_ref }} ---> ${{ github.base_ref }}.
+            Pipeline status: ${{ needs.build.result }}.
+            Pull Request title: ${{ github.event.pull_request.title }}

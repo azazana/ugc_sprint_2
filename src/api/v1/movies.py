@@ -3,10 +3,12 @@
 import logging
 import random
 from http import HTTPStatus
+from typing import Any, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from api.v1.logging_setup import setup_root_logger
 from broker.kafka import KafkaBroker
-from fastapi import APIRouter, Depends, HTTPException, Request
 from models.base import MovieModel, Parameters
 from servises.views_movies import get_kafka_service
 
@@ -21,20 +23,24 @@ router = APIRouter()
 
 class RequestIdFilter(logging.Filter):
     """Добавление requist_id в заголовки сообщений."""
-    def __init__(self, request: Request = None):
+
+    def __init__(self, request: Optional[Request] = None) -> None:
         super().__init__()
         self.request = request
 
-    def filter(self, record):
-        record.request_id = self.request.headers.get("x-request-id")
+    def filter(self, record: Any) -> bool:
+        """Фильтрация."""
+        if self.request:
+            record.request_id = self.request.headers.get("x-request-id")
         return True
 
 
-@router.get("/",
-            summary="Тестирование логирования",
-            response_description="Тестирование логирования данных",
-            )
-async def index(request: Request):
+@router.get(
+    "/",
+    summary="Тестирование логирования",
+    response_description="Тестирование логирования данных",
+)
+async def index(request: Request) -> str:
     """
      Для тестирования log.
      """
@@ -49,10 +55,11 @@ async def index(request: Request):
     summary="Статус просмотра фильма",
     response_description="Сообщение для кафки о статусе просмотра фильма",
 )
-async def put_film_to_kafka(request: Request,
-                            param: Parameters = Depends(),
-                            kafka_service: KafkaBroker = Depends(get_kafka_service)
-                            ) -> str:
+async def put_film_to_kafka(
+        request: Request,
+        param: Parameters = Depends(),
+        kafka_service: KafkaBroker = Depends(get_kafka_service),
+) -> str:
     """
     Отправка сообщений о статусе просмотра фильма.
 
@@ -71,12 +78,13 @@ async def put_film_to_kafka(request: Request,
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
 
 
-@router.get("/sentry-debug",
-            summary="Тестирование sentry",
-            response_description="Используется для тестирования sentry",
-            )
-async def trigger_error(request: Request):
+@router.get(
+    "/sentry-debug",
+    summary="Тестирование sentry",
+    response_description="Используется для тестирования sentry",
+)
+async def trigger_error(request: Request) -> None:
     """
     Для тестирования sentry.
     """
-    division_by_zero = 1 / 0
+    _ = 1 / 0
