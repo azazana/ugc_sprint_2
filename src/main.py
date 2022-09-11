@@ -1,6 +1,7 @@
 """Основной модуль для запуска fastapi."""
 
-from typing import Tuple, Callable
+from http import HTTPStatus
+from typing import Callable, Tuple
 from uuid import uuid4
 
 import aiokafka
@@ -8,7 +9,7 @@ import sentry_sdk
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
-from http import HTTPStatus
+
 from api.v1 import movies
 from core.config import settings
 from db import kafka_db
