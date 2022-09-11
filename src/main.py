@@ -1,13 +1,13 @@
 """Основной модуль для запуска fastapi."""
 
 import os
-from typing import Tuple
+from typing import Tuple, Callable
 from uuid import uuid4
 
 import aiokafka
 import sentry_sdk
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
 
 from api.v1 import movies
@@ -44,7 +44,7 @@ async def shutdown() -> None:
 
 
 @app.middleware("http")
-async def request_middleware(request, call_next):
+async def request_middleware(request: Request, call_next: Callable) -> ORJSONResponse:
     """Добавление requist id в заголовки."""
     id_header: Tuple[bytes, bytes] = "x-request-id".encode(), str(uuid4()).encode()
     request.headers.__dict__["_list"].append(id_header)
