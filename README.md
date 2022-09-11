@@ -5,6 +5,8 @@
 # Quick start
 Для запуска используйте команду `docker-compose up --build`.
 
+Для полноценной работы необходимо также сконфигурировать кластер mongo.db.
+Для этого запустите скрипт `bash scripts/mongo.sh`
 
 # Research
 

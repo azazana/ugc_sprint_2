@@ -1,5 +1,5 @@
 """Основной модуль для запуска fastapi."""
-
+import logging
 from http import HTTPStatus
 from typing import Callable, Tuple
 from uuid import uuid4
@@ -10,7 +10,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import movies
+from api.v1 import likes, movies
 from core.config import settings
 from db import kafka_db
 
@@ -28,6 +28,7 @@ app = FastAPI(
 )
 
 app.include_router(movies.router, prefix="/api/v1/movies", tags=["movies"])
+app.include_router(likes.router, prefix="/api/v1/likes", tags=["movies"])
 
 
 @app.on_event("startup")
@@ -59,6 +60,7 @@ async def request_middleware(request: Request, call_next: Callable) -> ORJSONRes
 
 
 if __name__ == "__main__":
+    logging.info("HELLO!")
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
