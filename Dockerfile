@@ -2,11 +2,11 @@ FROM python:3.9
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
+COPY requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-COPY ./src /code
+COPY src /code
 
 CMD ["gunicorn", "--config", "/code/gunicorn.py", "main:app"]
 #CMD ["--config", "gunicorn.py", "main:app"]

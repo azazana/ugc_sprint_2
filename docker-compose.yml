@@ -10,7 +10,7 @@ services:
       ports:
         - "5044:5044/udp"
       volumes:
-        - ./fast_api_log/deploy/logstash.conf:/config/logstash.conf:ro
+        - ./deploy/logstash.conf:/config/logstash.conf:ro
       command: logstash -f /config/logstash.conf
 
     elasticsearch:
@@ -33,7 +33,7 @@ services:
 
     app:
       container_name: "fast_api_log"
-      build: ./fast_api_log
+      build: .
       restart: always
       environment:
         host_kafka: "${host_kafka}"
@@ -42,13 +42,13 @@ services:
       ports:
         - 8000:8000
       volumes:
-        - ./fast_api_log/src/logs/:/code/logs/
+        - ./src/logs/:/code/logs/
 
     nginx:
       image: nginx:1.19.2
       volumes:
-        - ./fast_api_log/deploy/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-        - ./fast_api_log/deploy/etc/nginx/conf.d:/etc/nginx/conf.d:ro
+        - ./deploy/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./deploy/etc/nginx/conf.d:/etc/nginx/conf.d:ro
         - /tmp/logs/nginx/:/var/log/nginx/
       depends_on:
         - app
@@ -57,10 +57,10 @@ services:
 
     filebeat:
       build:
-        context: ./fast_api_log/filebeat
+        context: filebeat
       container_name: filebeat
       volumes:
-        - ./fast_api_log/src/logs/:/src/logs
+        - ./src/logs/:/src/logs
         - /tmp/logs/nginx:/var/log/nginx:ro
       depends_on:
         - elasticsearch
