@@ -53,4 +53,4 @@ jobs:
           message: |
             New build in Pull Request:  ${{ github.head_ref }} ---> ${{ github.base_ref }}.
             Pipeline status: ${{ needs.build.result }}.
-            Commit message:
+            Pull Request title: ${{ github.event.pull_request.title }}
