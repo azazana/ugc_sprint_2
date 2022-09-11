@@ -47,4 +47,4 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
             Pull Request: from ${{ github.head_ref }} to ${{ github.base_ref }}.
-            Pipeline status: ${{ toJSON(needs.build) }}
+            Pipeline status: ${{ toJSON(needs) }}
