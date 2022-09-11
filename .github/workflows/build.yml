@@ -3,7 +3,7 @@ name: Build
 on:
   pull_request:
     branches:
-      - '*'
+      - 'main'
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 src
+          flake8 src --exit-zero --format=html
 
       - name: Check with mypy
         run: |
@@ -45,5 +45,5 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Pull Request: from ${{ github.head_ref }} to ${{ github.head_ref }}.
+            Pull Request: from ${{ github.head_ref }} to ${{ github.base_ref }}.
             Pipeline status: ${{ needs.build.result }}
