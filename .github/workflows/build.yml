@@ -34,7 +34,7 @@ jobs:
       - name: Check with mypy
         run: |
           export MYPYPATH=src/
-          mypy src --ignore-missing-imports=true
+          mypy src --ignore-missing-imports
 
   notify:
     needs: build
