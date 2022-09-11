@@ -46,5 +46,7 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Pull Request: from ${{ github.head_ref }} to ${{ github.base_ref }}.
-            Pipeline status: ${{ toJSON(jobs) }}
+            New build in Pull Request:  ${{ github.head_ref }} ---> ${{ github.base_ref }}.
+            Pipeline status: ${{ needs.build.status }}.
+            Commit message: ${{ github.event.commits[0].message }}
+
