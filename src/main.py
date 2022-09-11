@@ -35,7 +35,7 @@ async def startup() -> None:
     if kafka_db:
         kafka_db.kafka_producer = aiokafka.AIOKafkaProducer(
             bootstrap_servers=f"{settings.KAFKA_HOST}:{settings.KAFKA_PORT}",
-        )  # type: ignore
+        )
 
 
 @app.on_event("shutdown")
